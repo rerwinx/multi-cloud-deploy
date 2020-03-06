@@ -38,4 +38,65 @@ jobs:
               repo: context.repo.repo,
               body: '👋 @' + context.actor + ', kicking off deployment on Azure of (docker image ' + gprUrl + ' ) now ...'
             })
+              
+      - name: 'Checkout Github Action' 
+        uses: actions/checkout@master
+    
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+      - uses: azure/docker-login@v1
+        with:
+          login-server: docker.pkg.github.com
+          username: ${{ github.actor }}
+          password: ${{secrets.GITHUB_TOKEN}}
+    
       
+      - uses: azure/webapps-container-deploy@v1
+        with:
+          app-name: 'rerwinx-aspnetapp'
+          images: 'docker.pkg.github.com/rerwinx/multi-cloud-deploy/aspnetapp:${{ github.sha }}'
+    
+      - name: Azure logout
+        run: |
+          az logout
+      
+      - name: Update issue success
+        if: (success())
+        env:
+          issue_number: '${{ github.event.issue.number }}'
+        uses: actions/github-script@0.5.0
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const { issue_number} = process.env;
+            github.issues.createComment({
+              issue_number: issue_number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Deployed successfully to Azure:' + 'https://rerwinx-aspnetapp.azurewebsites.net/'
+            })
+            github.issues.addLabels({
+              issue_number: issue_number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['deployed']
+            })
+        
+      - name: Update issue failure
+        if: (failure())
+        env:
+          issue_number: '${{github.event.issue.number}}'
+        uses: actions/github-script@0.5.0
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const { issue_number, cloud, gprUrl, customer } = process.env;
+            github.issues.createComment({
+              issue_number: issue_number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Deployment to Azure failed for ' +  owner + ' :cry:'
+            })
