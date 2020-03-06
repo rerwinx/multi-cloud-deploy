@@ -1,0 +1,40 @@
+name: Issue Created - Deploy to Azure
+
+# Runs when an issue is created.
+on:
+  issues:
+    types: [created] 
+    
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  
+  # This workflow contains a single job called "build"
+  deploy-to-azure:
+    
+    # Check if the Issue title is the one we want from our Issue Template
+    if: startsWith(github.event.issue.title, 'Deploy to Azure') 
+    
+    # TODO: Add an approval process
+      
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Starting deployment
+        uses: actions/github-script@0.5.0
+        env:
+          title: ${{ github.event.issue.title }}
+          body: ${{ github.event.issue.body }}
+        with:
+          github-token: ${{secrets.GPR_PAT}}
+          script: |
+            const { title, body } = process.env;
+            let gprUrl='docker.pkg.github.com/'+context.repo.owner.toLowerCase()+'/'+context.repo.repo.toLowerCase()+'/aspnetapp:latest'
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👋 @' + context.actor + ', kicking off deployment on Azure of (docker image ' + gprUrl + ' ) now ...'
+            })
+      
