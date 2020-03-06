@@ -18,10 +18,6 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
-    
-    # We don't need to build the project.  
-    #- name: Build with dotnet
-    #  run: dotnet build --configuration Release
    
     - uses: Azure/docker-login@v1
       with:
@@ -31,7 +27,6 @@ jobs:
         # password: ${{ secrets.REGISTRY_PASSWORD }}
         # Can I use GitHub Token here?
         
-    - name: Build image and push to Packages 
     - run: |
         docker build -t aspnetapp .
         docker tag aspnetapp docker.pkg.github.com/rerwinx/multi-cloud-deploy/aspnetapp:${{ github.sha }}        
