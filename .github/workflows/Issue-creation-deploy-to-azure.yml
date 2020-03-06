@@ -27,7 +27,8 @@ jobs:
           title: ${{ github.event.issue.title }}
           body: ${{ github.event.issue.body }}
         with:
-          github-token: ${{secrets.GPR_PAT}}
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          #github-token: ${{secrets.GPR_PAT}}
           script: |
             const { title, body } = process.env;
             let gprUrl='docker.pkg.github.com/'+context.repo.owner.toLowerCase()+'/'+context.repo.repo.toLowerCase()+'/aspnetapp:latest'
