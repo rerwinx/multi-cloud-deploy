@@ -53,6 +53,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{secrets.GITHUB_TOKEN}}
     
+      - run: |
+          docker pull docker.pkg.github.com/rerwinx/multi-cloud-deploy/aspnetapp:${{ github.sha }}
       
       - uses: azure/webapps-container-deploy@v1
         with:
