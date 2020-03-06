@@ -3,7 +3,7 @@ name: Issue Created - Deploy to Azure
 # Runs when an issue is created.
 on:
   issues:
-    types: [created] 
+    types: [opened] 
     
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
