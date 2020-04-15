@@ -26,10 +26,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
       
-      - run: |
-          docker build -t aspnetapp .
-          docker tag aspnetapp docker.pkg.github.com/rerwinx/multi-cloud-deploy/aspnetapp:${{ github.sha }}        
-          docker push docker.pkg.github.com/rerwinx/multi-cloud-deploy/aspnetapp:${{ github.sha }}
+ #     - run: |
+ #         docker build -t aspnetapp .
+ #         docker tag aspnetapp docker.pkg.github.com/rerwinx/multi-cloud-deploy/aspnetapp:${{ github.sha }}        
+ #         docker push docker.pkg.github.com/rerwinx/multi-cloud-deploy/aspnetapp:${{ github.sha }}
       
       
       - name: Build the Docker image
