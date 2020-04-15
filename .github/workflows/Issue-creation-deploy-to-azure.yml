@@ -27,8 +27,7 @@ jobs:
           title: ${{ github.event.issue.title }}
           body: ${{ github.event.issue.body }}
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          #github-token: ${{secrets.GPR_PAT}}
+          github-token: ${{secrets.GP_TOKEN}}
           script: |
             const { title, body } = process.env;
             let gprUrl='docker.pkg.github.com/'+context.repo.owner.toLowerCase()+'/'+context.repo.repo.toLowerCase()+'/aspnetapp:latest'
@@ -51,7 +50,7 @@ jobs:
         with:
           login-server: docker.pkg.github.com
           username: ${{ github.actor }}
-          password: ${{secrets.GITHUB_TOKEN}}
+          password: ${{secrets.GP_TOKEN}}
     
       - run: |
           docker pull docker.pkg.github.com/rerwinx/multi-cloud-deploy/aspnetapp:${{ github.sha }}
