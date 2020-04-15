@@ -80,7 +80,7 @@ jobs:
         uses: azure/webapps-container-deploy@v1
         with:
           app-name: ${{ env.WEBAPP_NAME }}
-          images: ${{ format('{0}/{1}/{2}:{3}', 'docker.pkg.github.com', github.repository, $PACKAGE_NAME, github.sha) }}
+          images: ${{ format('{0}/{1}/{2}:{3}', 'docker.pkg.github.com', github.repository, ${{ env.PACKAGE_NAME }}, github.sha) }}
  
       - name: Azure logout
         run: |
