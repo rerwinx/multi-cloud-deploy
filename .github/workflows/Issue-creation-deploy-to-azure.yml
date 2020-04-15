@@ -8,8 +8,10 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   
-  # This workflow contains a single job called "build"
+  # This workflow contains a single job called "deploy-to-azure"
   deploy-to-azure:
+    env:
+      WEBAPP_NAME: rerwinx-multicloud-web 
     
     # Check if the Issue title is the one we want from our Issue Template
     if: startsWith(github.event.issue.title, 'Deploy to Azure') 
@@ -21,6 +23,7 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      
       - name: Starting deployment
         uses: actions/github-script@0.5.0
         env:
@@ -52,14 +55,33 @@ jobs:
           username: ${{ github.actor }}
           password: ${{secrets.GP_TOKEN}}
     
-      - run: |
-          docker pull docker.pkg.github.com/rerwinx/multi-cloud-deploy/aspnetapp:${{ github.sha }}
+      #- run: |
+      #    docker pull docker.pkg.github.com/rerwinx/multi-cloud-deploy/aspnetapp:${{ github.sha }}
       
       - uses: azure/webapps-container-deploy@v1
         with:
           app-name: 'rerwinx-aspnetapp'
           images: 'docker.pkg.github.com/rerwinx/multi-cloud-deploy/aspnetapp:${{ github.sha }}'
-    
+ 
+      - name: Create the web app
+        env:
+          RESOURCE_GROUP: rerwinxmulticloud
+          APP_SERVICE_PLAN: rerwinx-multicloud-asp
+          DOCKER_USERNAME: ${{ github.actor }}
+          DOCKER_PASSWORD: ${{secrets.GP_TOKEN}}
+          DOCKER_REGISTRY_URL: docker.pkg.github.com
+          PACKAGE_NAME: aspnetapp
+        run: |
+          az webapp create --resource-group $RESOURCE_GROUP --plan $APP_SERVICE_PLAN --name $WEBAPP_NAME --deployment-container-image-name docker.pkg.github.com/$GITHUB_REPOSITORY/$PACKAGE_NAME:$GITHUB_SHA
+          az webapp config container set --resource-group $RESOURCE_GROUP --name $WEBAPP_NAME --docker-registry-server-password $DOCKER_PASSWORD --docker-registry-server-user $DOCKER_USERNAME --docker-registry-server-url $DOCKER_REGISTRY_URL
+          az webapp update -g $RESOURCE_GROUP -n $WEBAPP_NAME --set tags.ref=$GITHUB_REF tags.type=prod
+        
+      - name: Deploy the container
+        uses: azure/webapps-container-deploy@v1
+        with:
+          app-name: ${{ env.WEBAPP_NAME }}
+          images: ${{ format('{0}/{1}/{2}:{3}', 'docker.pkg.github.com', github.repository, $PACKAGE_NAME, github.sha) }}
+ 
       - name: Azure logout
         run: |
           az logout
