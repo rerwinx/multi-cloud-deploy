@@ -7,11 +7,15 @@ on:
     branches: [ master ]
 
 jobs:
+
   build:
+    env: 
+      PACKAGE_NAME: aspnetapp
 
     runs-on: ubuntu-latest
 
     steps:
+
     - uses: actions/checkout@v2
    
     - name: Setup .NET Core
@@ -23,12 +27,18 @@ jobs:
       with:
         login-server: docker.pkg.github.com
         username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-        # password: ${{ secrets.REGISTRY_PASSWORD }}
-        # Can I use GitHub Token here?
-        
-    - run: |
-        docker build -t aspnetapp .
-        docker tag aspnetapp docker.pkg.github.com/rerwinx/multi-cloud-deploy/aspnetapp:${{ github.sha }}        
-        docker push docker.pkg.github.com/rerwinx/multi-cloud-deploy/aspnetapp:${{ github.sha }}
+        password: ${{ secrets.GP_TOKEN }}
+
+    - name: Publish to GitHub Package Registry
+      env:
+        DOCKER_TOKEN: ${{secrets.GP_TOKEN}}
+        DOCKER_USER: ${{ github.actor }}
+      
+      run: |
+          docker push docker.pkg.github.com/$GITHUB_REPOSITORY/$PACKAGE_NAME:$GITHUB_SHA
+
+#    - run: |
+#        docker build -t aspnetapp .
+#        docker tag aspnetapp docker.pkg.github.com/rerwinx/multi-cloud-deploy/aspnetapp:${{ github.sha }}        
+#        docker push docker.pkg.github.com/rerwinx/multi-cloud-deploy/aspnetapp:${{ github.sha }}
       
