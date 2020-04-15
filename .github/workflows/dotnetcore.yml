@@ -28,12 +28,14 @@ jobs:
         login-server: docker.pkg.github.com
         username: ${{ github.actor }}
         password: ${{ secrets.GP_TOKEN }}
+     
+    - name: Build and tag the Docker image
+      run: docker build . --file Dockerfile --tag docker.pkg.github.com/$GITHUB_REPOSITORY/$PACKAGE_NAME:$GITHUB_SHA
 
     - name: Publish to GitHub Package Registry
       env:
         DOCKER_TOKEN: ${{secrets.GP_TOKEN}}
         DOCKER_USER: ${{ github.actor }}
-      
       run: |
           docker push docker.pkg.github.com/$GITHUB_REPOSITORY/$PACKAGE_NAME:$GITHUB_SHA
 
