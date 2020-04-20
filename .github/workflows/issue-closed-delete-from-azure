@@ -3,7 +3,7 @@ name: Issue Closed - Deelete from Azure
 # Runs when an issue is created.
 on:
   issues:
-    types: [closed] 
+    types: closed 
     
 jobs:
   
