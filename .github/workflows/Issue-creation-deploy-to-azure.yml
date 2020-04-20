@@ -72,7 +72,7 @@ jobs:
           DOCKER_REGISTRY_URL: docker.pkg.github.com
           PACKAGE_NAME: aspnetapp
         run: |
-          az webapp create --resource-group $RESOURCE_GROUP --plan $APP_SERVICE_PLAN --name $WEBAPP_NAME --deployment-container-image-name docker.pkg.github.com/$GITHUB_REPOSITORY/$PACKAGE_NAME:$GITHUB_SHA
+          az webapp create --resource-group $RESOURCE_GROUP --plan $APP_SERVICE_PLAN --name $WEBAPP_NAME --deployment-container-image-name docker.pkg.github.com/$GITHUB_REPOSITORY/$PACKAGE_NAME:$GITHUB_SHA --debug
           az webapp config container set --resource-group $RESOURCE_GROUP --name $WEBAPP_NAME --docker-registry-server-password $DOCKER_PASSWORD --docker-registry-server-user $DOCKER_USERNAME --docker-registry-server-url $DOCKER_REGISTRY_URL
           az webapp update -g $RESOURCE_GROUP -n $WEBAPP_NAME --set tags.ref=$GITHUB_REF tags.type=prod
         
