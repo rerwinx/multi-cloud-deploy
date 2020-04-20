@@ -11,15 +11,27 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  
+  delete-from-azure:
+  
+    env:
+      WEBAPP_NAME: rerwinx-multicloud-web 
+    
+    if: startsWith(github.event.issue.title, 'Deploy to Azure') 
+    
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    
     steps:
-
-    # Runs a single command using the runners shell
-    - name: Run a one-line script
-      run: echo Hello, world!
-
+    
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+     
+      - name: Delete the web app
+        env:
+          RESOURCE_GROUP: rerwinxmulticloud
+        run: az webapp delete --resource-group $RESOURCE_GROUP --name $WEBAPP_NAME
+        
+      - name: Azure logout
+        run: az logout
